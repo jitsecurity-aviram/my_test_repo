@@ -1,0 +1,69 @@
+name: Minimum Viable Security plan for Github Marketplace
+level: beginner
+author: Github
+version: 0.1
+references:
+  - https://docs.github.com/en/developers/github-marketplace/creating-apps-for-github-marketplace/security-best-practices-for-apps
+tags:
+  - github
+  - marketplace
+owners:
+  default:
+# -------------- List of plan items ----------
+items:
+  - name: Use Github App instead of Github OAuth app
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-github-app-type.yml@latest
+
+  - name: Follow Least Privilege Principle
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-least-privilege-principle.yml@latest
+
+  - name: Allow account direct deletion
+    uses: jitsecurity-controls/jit-plans/items/data/item-account-deletion.yml@latest
+
+  - name: Use dedicated Github App for each device type (desktop/mobile)
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-dedicated-app-per-device-type.yml@latest
+
+  - name: Implement RBAC in your app
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-rbac.yml@latest
+
+  - name: Do not share account services accross apps
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-account-services-sharing.yml@latest
+
+  - name: All services should have unique login and credentials
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-third-party-account-sharing.yml@latest
+
+  - name: Grant access to production only to Eng and employees with admin duties
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-admin-privilege.yml@latest
+
+  - name: Use Github OAuth or Github App token to communicate with Github API
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-github-api-access.yml@latest
+
+  - name: Encrypt traffic in transit
+    uses: jitsecurity-controls/jit-plans/items/data/item-traffic-encryption.yml@latest
+
+  - name: Store app Client ID and secret securely
+    uses: jitsecurity-controls/jit-plans/items/data/item-app-credentials-storage.yml@latest
+
+  - name: Delete Github user data within 30 days of deletion request
+    uses: jitsecurity-controls/jit-plans/items/data/item-user-data-deletion.yml@latest
+
+  - name: Don't ask for the user Github password
+    uses: jitsecurity-controls/jit-plans/items/third-party-app/item-ask-third-party-password.yml@latest
+
+  - name: Encrypt any secret data
+    uses: jitsecurity-controls/jit-plans/items/data/item-secret-encryption.yml@latest
+
+  - name: Add logging capability for your app
+    uses: jitsecurity-controls/jit-plans/items/operations/item-logging.yml@latest
+
+  - name: Ensure log retention for 30 days
+    uses: jitsecurity-controls/jit-plans/items/operations/item-logging-retention.yml@latest
+
+  - name: Ensure log format includes critical fields
+    uses: jitsecurity-controls/jit-plans/items/operations/item-logs-format.yml@latest
+
+  - name: Create Incident Response plan
+    uses: jitsecurity-controls/jit-plans/items/operations/item-incident-response-plan.yml@latest
+
+  - name: Conduct periodic vulnerability scans
+    uses: jitsecurity-controls/jit-plans/items/infrastructure/item-vulnerability-scan.yml@latest
