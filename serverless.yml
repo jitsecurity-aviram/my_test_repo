@@ -1,0 +1,75 @@
+service: onboarding-notifier
+frameworkVersion: "2.62.0"
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - kms:Decrypt
+        - kms:DescribeKey
+        - kms:GenerateDataKey
+      Resource:
+        - arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/${self:custom.kms.${self:provider.stage}}
+    - Effect: Allow
+      Action:
+        - ssm:GetParameter
+        - ssm:DescribeParameter
+      Resource:
+        - arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${opt:stage}/providers/hubspot
+        - arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${opt:stage}/providers/onboarding-slack
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
+  - serverless-python-requirements
+  - serverless-ignore
+package:
+  exclude:
+    - node_modules/**
+    - ops/**
+    - venv/**
+    - __pycache__/**
+functions:
+  onboarding_notify:
+    handler: handler.notify
+    events:
+      - httpApi: 'POST /webhook'
+    environment:
+      STAGE: ${opt:stage}
+  hubspot_daily_company_update:
+    handler: hubspot_handler.handler
+    events:
+      - schedule: cron(00 05 * * ? *)
+    environment:
+      STAGE: ${opt:stage}
+    iamRoleStatementsName: onboarding-notifier-hubspot-company-update
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - ssm:GetParameter
+        Resource:
+          - arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${opt:stage}/providers/hubspot
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource:
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Tenants
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Tenants/index/*
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Users
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Findings
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Action
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/PrEvent
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/PrEvent/index/*
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/PRWelcomeMessages
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/SecurityReviews
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/SecurityReviews/index/*
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Assets
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Plan
+custom:
+  pythonRequirements:
+    fileName: requirements.txt
+    dockerizePip: false
+  kms:
+    dev: c9cca952-a4cc-4266-bff9-d65a9eeb2896
+    prod: 27507608-e9b6-45a6-abd6-5433337ce190
